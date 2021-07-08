@@ -14,15 +14,16 @@ export var ui_cooldown := 0.1
 var board_position := Vector2.ZERO
 
 const BOUND_MARGIN := 0.1 # needed so the right and bot sides don't wrap
-var left_bound: float
-var right_bound: float
-var top_bound: float
-var bot_bound: float
+var _left_bound: float
+var _right_bound: float
+var _top_bound: float
+var _bot_bound: float
 
 var index := 0 setget set_index
 
 onready var _sprite: Sprite = $Sprite
 onready var _timer: Timer = $Timer
+
 
 func _ready() -> void:
 	yield(owner, "ready") # wait for Board to set board_position = its position
@@ -34,10 +35,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	
 	if event is InputEventMouseMotion:
-		if (event.position.x < left_bound
-			or event.position.x > right_bound
-			or event.position.y < top_bound
-			or event.position.y > bot_bound):
+		if (event.position.x < _left_bound
+			or event.position.x > _right_bound
+			or event.position.y < _top_bound
+			or event.position.y > _bot_bound):
 				return
 		
 		self.index = grid.calculate_index_from_board_position(event.position, board_position)
@@ -89,7 +90,7 @@ func set_bounds() -> void:
 	var board_width: float = cell_size.x * grid.columns
 	var board_height: float = cell_size.y * grid.rows
 	
-	left_bound = board_position.x
-	right_bound = left_bound + board_width - BOUND_MARGIN
-	top_bound = board_position.y
-	bot_bound = top_bound + board_height - BOUND_MARGIN
+	_left_bound = board_position.x
+	_right_bound = _left_bound + board_width - BOUND_MARGIN
+	_top_bound = board_position.y
+	_bot_bound = _top_bound + board_height - BOUND_MARGIN

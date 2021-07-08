@@ -55,6 +55,49 @@ func calculate_index_from_board_position(global_position: Vector2, board_offset:
 	return index
 
 
+func clamp_ship_placement(index: int, size: int, is_vertical: bool) -> int:
+	var out = index
+	var column = get_column(out)
+	var row = get_row(out)
+	
+	if not is_vertical:
+		if column > (columns - size):
+			var nearest_ten = ( row + 1 ) * columns
+			out = (nearest_ten - size)
+	else:
+		if row > (rows - size):
+			out = (rows - size) * columns + column
+	
+	return out
+
+
+func is_cell_empty(index: int) -> bool:
+	return true if cells[index] == States.EMPTY else false
+
+
+func get_adjacents(index: int) -> PoolIntArray:
+	var adjacents: PoolIntArray = []
+	
+	for key in Directions:
+		if get_column(index) == columns - 1 and key == "RIGHT":
+			continue
+		
+		if get_column(index) == 0 and key == "LEFT":
+			continue
+		
+		var direction = Directions.get(key)
+		var adjacent = index + direction
+		
+		if is_within_bounds(adjacent):
+			adjacents.append(adjacent)
+	
+	return adjacents
+
+
+func is_within_bounds(index: int) -> bool:
+	return index >= 0 and index <= (rows * columns - 1)
+
+
 func clamp(index: int) -> int:
 	var out := index
 	

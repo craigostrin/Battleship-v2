@@ -28,12 +28,18 @@ _global_script_classes=[ {
 "class": "Grid",
 "language": "GDScript",
 "path": "res://Grid.gd"
+}, {
+"base": "Node2D",
+"class": "Ship",
+"language": "GDScript",
+"path": "res://Board/Ship.gd"
 } ]
 _global_script_class_icons={
 "Board": "",
 "Cursor": "",
 "EnemyAI": "",
-"Grid": ""
+"Grid": "",
+"Ship": ""
 }
 
 [application]

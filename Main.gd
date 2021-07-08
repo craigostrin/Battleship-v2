@@ -34,8 +34,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _start_setup() -> void:
-	player_board.start_player_ship_placement() # create cursor
-	enemy_ai.start_enemy_ship_placement()
+	player_board.player_start_ship_placement() # create cursor
+	enemy_ai.start_ship_placement()
 
 
 func _on_all_ships_placed() -> void:
