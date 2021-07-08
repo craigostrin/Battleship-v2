@@ -1,3 +1,5 @@
+# Player-controlled cursor. Allows them to navigate the game grid, select units, and move them.
+# Supports both keyboard and mouse (or touch) input.
 class_name Cursor
 extends Node2D
 
