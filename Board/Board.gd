@@ -7,14 +7,16 @@ signal all_ships_placed
 signal attack_confirmed
 signal all_ships_sunk
 
+export var is_enemy_board := false
+
+var ship_lengths := [5, 4, 3, 3, 2]
+var placed_ships := []
+var ship_index := 0
+
 export var grid: Resource = preload("res://PlayerGrid.tres")
 export var default_sprite: Texture = preload("res://Art/water.png")
 export var hit_sprite: Texture = preload("res://Art/hit_transparent.png")
 export var miss_sprite: Texture = preload("res://Art/miss.png")
-
-var ship_lengths := [2, 3, 3, 4, 5]
-var placed_ships := []
-var ship_index := 0
 
 onready var _cursor: Cursor = $Cursor
 
@@ -40,36 +42,26 @@ func player_start_ship_placement() -> void:
 func place_ship(ship: Ship, index: int) -> void:
 	var length := ship.length
 	var is_vertical := ship.is_vertical
-	var index_array := get_ship_index_array(length, index, is_vertical)
+	var index_array: PoolIntArray = grid.get_ship_index_array(index, length, is_vertical)
 	
-	if not are_cells_empty(index_array):
+	if not _are_cells_empty(index_array):
 		emit_signal("ship_not_placed", ship)
-		print("ship not placed")
 		return
 	
-	for index in index_array:
-		grid.cells[index] = grid.States.SHIP
+	for i in index_array:
+		grid.cells[i] = grid.States.SHIP
 	
 	ship.position = grid.calculate_board_position(index)
 	add_child(ship)
+#	if is_enemy_board: DEBUG
+#		ship.hide()
 	
 	#print("placed " + ship.name + " at " + str(index) + " on " + name)
 
 
-func get_ship_index_array(length: int, index: int, is_vertical: bool) -> PoolIntArray:
-	var index_array: PoolIntArray = []
-	
-	if not is_vertical:
-		for i in length:
-			index_array.append(index + i)
-	else:
-		for i in length:
-			index_array.append(index + i * grid.columns)
-	
-	return index_array
-
-
-func are_cells_empty(index_array: PoolIntArray) -> bool:
+# Move this to Grid.gd if another class ever needs to use it
+# For now I think it's fine here 
+func _are_cells_empty(index_array: PoolIntArray) -> bool:
 	var are_empty := true
 	
 	for index in index_array:
@@ -87,6 +79,7 @@ func are_cells_empty(index_array: PoolIntArray) -> bool:
 
 func toggle_cursor() -> void:
 	_cursor.visible = !_cursor.visible
+	_cursor.set_process_unhandled_input(_cursor.visible)
 
 
 func create_sprite_at_index(texture: Texture, index: int) -> void:

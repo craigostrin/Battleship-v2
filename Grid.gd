@@ -55,24 +55,37 @@ func calculate_index_from_board_position(global_position: Vector2, board_offset:
 	return index
 
 
-func clamp_ship_placement(index: int, size: int, is_vertical: bool) -> int:
+func clamp_ship_placement(index: int, length: int, is_vertical: bool) -> int:
 	var out = index
 	var column = get_column(out)
 	var row = get_row(out)
 	
 	if not is_vertical:
-		if column > (columns - size):
+		if column > (columns - length):
 			var nearest_ten = ( row + 1 ) * columns
-			out = (nearest_ten - size)
+			out = (nearest_ten - length)
 	else:
-		if row > (rows - size):
-			out = (rows - size) * columns + column
+		if row > (rows - length):
+			out = (rows - length) * columns + column
 	
 	return out
 
 
 func is_cell_empty(index: int) -> bool:
 	return true if cells[index] == States.EMPTY else false
+
+
+func get_ship_index_array(index: int, length: int, is_vertical: bool) -> PoolIntArray:
+	var index_array: PoolIntArray = []
+	
+	if not is_vertical:
+		for i in length:
+			index_array.append(index + i)
+	else:
+		for i in length:
+			index_array.append(index + i * columns)
+	
+	return index_array
 
 
 func get_adjacents(index: int) -> PoolIntArray:

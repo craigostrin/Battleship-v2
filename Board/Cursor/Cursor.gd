@@ -6,8 +6,6 @@ extends Node2D
 signal moved(new_index)
 signal accept_pressed(index)
 
-export var cursor_texture: Texture = preload("res://Art/cursor.png")
-
 # preload for DEBUG
 var grid: Resource = preload("res://PlayerGrid.tres")
 export var ui_cooldown := 0.1
@@ -20,6 +18,8 @@ var _top_bound: float
 var _bot_bound: float
 
 var index := 0 setget set_index
+
+export var cursor_texture: Texture = preload("res://Art/cursor.png")
 
 onready var _sprite: Sprite = $Sprite
 onready var _timer: Timer = $Timer
@@ -83,7 +83,7 @@ func set_index(value: int) -> void:
 
 func set_bounds() -> void:
 	if not grid:
-		printerr("set_bounds(): Missing Grid resource assigned to cursor.")
+		printerr("set_bounds(): Missing Grid resource assigned to Cursor.")
 		return
 	
 	var cell_size: Vector2 = grid.cell_size

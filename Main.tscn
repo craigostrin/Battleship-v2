@@ -24,6 +24,7 @@ position = Vector2( 64, 64 )
 
 [node name="EnemyBoard" parent="Boards" instance=ExtResource( 3 )]
 position = Vector2( 480, 64 )
+is_enemy_board = true
 grid = ExtResource( 4 )
 
 [node name="UI" type="CanvasLayer" parent="."]
