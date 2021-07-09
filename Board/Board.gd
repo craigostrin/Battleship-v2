@@ -36,6 +36,11 @@ func initialize_sprites() -> void:
 
 func player_start_ship_placement() -> void:
 	toggle_cursor()
+	var length = ship_lengths[0]
+	var first_ship = Ship.new(length)
+	_cursor.ship_placer = first_ship
+	# TODO: assign_ship to cursor
+	# could use Main to only connect "ship_placed" signal to player_board
 
 
 # Everything that calls this should be using grid.clamp_ship_placement beforehand
@@ -55,6 +60,7 @@ func place_ship(ship: Ship, index: int) -> void:
 	add_child(ship)
 #	if is_enemy_board: DEBUG
 #		ship.hide()
+	
 	
 	#print("placed " + ship.name + " at " + str(index) + " on " + name)
 

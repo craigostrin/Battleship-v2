@@ -1,6 +1,8 @@
 class_name EnemyAI
 extends Node
 
+var prev_attack: int
+
 var rng := RandomNumberGenerator.new()
 # DEBUG Make sure to figure out what to do with this.. maybe all placement methods use my_board.grid?
 var grid := Grid.new()
@@ -58,9 +60,10 @@ func _on_ship_not_placed(ship: Ship) -> void:
 
 
 func _get_random_index() -> int:
-	var _max = grid.columns * grid.rows #- 1
+	# I found this created a more random distribution than randi_range(), which
+	# had ships bunching up on the edges a lot
+	var _max = grid.columns * grid.rows
 	return rng.randi() % _max
-	#return rng.randi_range(0, _max)
 
 
 func _get_random_bool() -> bool:

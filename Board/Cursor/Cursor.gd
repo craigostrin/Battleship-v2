@@ -6,6 +6,8 @@ extends Node2D
 signal moved(new_index)
 signal accept_pressed(index)
 
+var ship_placer: Ship setget set_ship_placer
+
 # preload for DEBUG
 var grid: Resource = preload("res://PlayerGrid.tres")
 export var ui_cooldown := 0.1
@@ -67,10 +69,18 @@ func _unhandled_input(event: InputEvent) -> void:
 		self.index += grid.Directions.LEFT
 	elif event.is_action("ui_down") and grid.get_row(index) < grid.rows - 1:
 		self.index += grid.Directions.DOWN
+	
+	if event.is_action_pressed("rotate_ship") and ship_placer:
+		ship_placer.is_vertical = !ship_placer.is_vertical
+		self.index = index # to reapply clamp_ship_placer
 
 
 func set_index(value: int) -> void:
 	var new_index: int = grid.clamp(value)
+	
+	if ship_placer:
+		new_index = grid.clamp_ship_placement(new_index, ship_placer.length, ship_placer.is_vertical)
+	
 	if new_index == index:
 		return
 	
@@ -79,6 +89,22 @@ func set_index(value: int) -> void:
 	
 	emit_signal("moved", index)
 	_timer.start(ui_cooldown)
+
+
+func set_ship_placer(ship: Ship) -> void:
+	var is_vertical := false
+	
+	# Retain is_vertical status from previous ship placer
+	if ship_placer:
+		is_vertical = ship_placer.is_vertical
+	
+	ship_placer = ship
+	_sprite.visible = false if ship_placer else true
+	
+	if ship_placer:
+		ship_placer.is_vertical = is_vertical
+		add_child(ship_placer)
+		self.index = index # reapply ship_placement clamp
 
 
 func set_bounds() -> void:
