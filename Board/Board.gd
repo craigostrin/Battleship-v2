@@ -4,6 +4,7 @@ extends Node2D
 signal ship_placed
 signal ship_not_placed(ship) #used by EnemyAI to try again
 signal attack_confirmed
+signal attack_not_confirmed
 signal all_ships_sunk
 
 export var is_player_controlled_board := true
@@ -11,6 +12,7 @@ export var is_player_controlled_board := true
 var ship_lengths := [5, 4, 3, 3, 2]
 var placed_ships := []
 var ship_index := placed_ships.size()
+var ships_sunk := 0
 
 export var grid: Resource = preload("res://PlayerGrid.tres")
 export var default_sprite: Texture = preload("res://Art/water.png")
@@ -46,12 +48,35 @@ func attack(index: int) -> void:
 	if _cursor.ship_placer:
 		return
 	
+	var cell = grid.cells[index]
+	if cell == grid.States.HIT or cell == grid.States.MISS:
+		emit_signal("attack_not_confirmed")
+		return
+	
+	if cell == grid.States.EMPTY:
+		cell = grid.States.MISS
+		create_sprite_at_index(miss_sprite, index)
+	
+	if cell == grid.States.SHIP:
+		cell = grid.States.HIT
+		var ship = get_ship_at_index(index)
+		ship.hit()
+		create_sprite_at_index(hit_sprite, index)
+	
+	grid.cells[index] = cell
 	
 	emit_signal("attack_confirmed")
 
 
+func _on_ship_sunk() -> void:
+	ships_sunk += 1
+	if ships_sunk >= placed_ships.size():
+		emit_signal("all_ships_sunk")
+
+
 # Everything that calls this should be using grid.clamp_ship_placement beforehand
 func place_ship(ship: Ship, index: int) -> void:
+	print("called place_ship")
 	var length := ship.length
 	var is_vertical := ship.is_vertical
 	var index_array: PoolIntArray = grid.get_ship_index_array(index, length, is_vertical)
@@ -67,12 +92,15 @@ func place_ship(ship: Ship, index: int) -> void:
 		_cursor.remove_child(ship)
 	
 	ship.position = grid.calculate_board_position(index)
+	ship.index_array = index_array
 	add_child(ship)
 	placed_ships.append(ship)
-	ship_index = placed_ships.size() # Will this work???
+	ship.connect("ship_sunk", self, "_on_ship_sunk")
+	
+	ship_index = placed_ships.size() # I guess this works?
 	emit_signal("ship_placed")
-#	if not is_player_controlled_board: DEBUG
-#		ship.hide()
+	if not is_player_controlled_board:
+		ship.hide()
 	
 	print("placed " + ship.name + " at " + str(index) + " on " + name)
 
@@ -111,6 +139,16 @@ func _are_cells_empty(index_array: PoolIntArray) -> bool:
 	return are_empty
 
 
+func get_ship_at_index(index: int) -> Ship:
+	var ship: Ship
+	
+	for _ship in placed_ships:
+		if _ship.index_array.has(index):
+			ship = _ship
+	
+	return ship
+
+
 func toggle_cursor() -> void:
 	_cursor.visible = !_cursor.visible
 	_cursor.set_process_unhandled_input(_cursor.visible)
@@ -120,4 +158,4 @@ func create_sprite_at_index(texture: Texture, index: int) -> void:
 	var sprite = Sprite.new()
 	sprite.position = grid.calculate_board_position(index)
 	sprite.texture = texture
-	$Sprites.add_child(sprite)
+	add_child(sprite)

@@ -1,12 +1,15 @@
 class_name Ship
 extends Node2D
 
+signal ship_sunk
+
 const MIN_LENGTH = 2
 const MAX_LENGTH = 5
 const CELL_WIDTH = 32
 
 var length: int
 var is_vertical := false setget _set_is_vertical
+var index_array := []
 
 var _hits: int
 

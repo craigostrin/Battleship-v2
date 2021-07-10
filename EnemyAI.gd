@@ -6,22 +6,41 @@ extends Node
 # 			One complex algorithm with checkerboard guessing (see: https://www.thesprucecrafts.com/how-to-win-at-battleship-411068)
 
 var prev_attack: int
+var think_time := 0.5
 
 var rng := RandomNumberGenerator.new()
 # DEBUG Make sure to figure out what to do with this.. maybe all placement methods use my_board.grid?
 var grid := Grid.new()
-onready var player_board: Board = $"../Boards/PlayerBoard"
+onready var _timer: Timer = $Timer
+onready var opponent_board: Board = $"../Boards/PlayerBoard"
 onready var my_board: Board = $"../Boards/EnemyBoard"
 
 
 func _ready() -> void:
 	rng.randomize()
 	my_board.connect("ship_not_placed", self, "_on_ship_not_placed")
+	opponent_board.connect("attack_not_confirmed", self, "_try_attack")
 
 
-func start_turn() -> void:
-	print("enemy's turn")
+func start_turn(number_of_attacks: int) -> void:
+	for i in number_of_attacks:
+		_try_attack()
+		yield(opponent_board, "attack_confirmed")
 
+
+func _try_attack() -> void:
+	_timer.start(think_time)
+	yield(_timer, "timeout")
+	
+	var index = _get_random_index()
+	opponent_board.attack(index)
+
+
+# Use this if you want to add fancy effects while the CPU is thinking
+# (like a 'Hmmm' sound or spinning icon)
+#func think_async(time: float) -> void:
+#	_timer.start(time)
+#	yield(_timer, "timeout")
 
 func start_ship_placement() -> void:
 	for length in my_board.ship_lengths:
