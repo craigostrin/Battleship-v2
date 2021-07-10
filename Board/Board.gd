@@ -3,15 +3,14 @@ extends Node2D
 
 signal ship_placed
 signal ship_not_placed(ship) #used by EnemyAI to try again
-signal all_ships_placed
 signal attack_confirmed
 signal all_ships_sunk
 
-export var is_enemy_board := false
+export var is_player_controlled_board := true
 
 var ship_lengths := [5, 4, 3, 3, 2]
 var placed_ships := []
-var ship_index := 0
+var ship_index := placed_ships.size()
 
 export var grid: Resource = preload("res://PlayerGrid.tres")
 export var default_sprite: Texture = preload("res://Art/water.png")
@@ -25,6 +24,7 @@ func _ready() -> void:
 	grid.initialize_grid()
 	initialize_sprites()
 	_cursor.board_position = position
+	_cursor.connect("accept_pressed", self, "_on_accept_pressed")
 
 
 func initialize_sprites() -> void:
@@ -34,13 +34,20 @@ func initialize_sprites() -> void:
 		index += 1
 
 
-func player_start_ship_placement() -> void:
-	toggle_cursor()
-	var length = ship_lengths[0]
-	var first_ship = Ship.new(length)
-	_cursor.ship_placer = first_ship
-	# TODO: assign_ship to cursor
-	# could use Main to only connect "ship_placed" signal to player_board
+func _on_accept_pressed(index: int) -> void:
+	if _cursor.ship_placer:
+		var ship: Ship = _cursor.ship_placer
+		place_ship(ship, index)
+	else:
+		attack(index)
+
+
+func attack(index: int) -> void:
+	if _cursor.ship_placer:
+		return
+	
+	
+	emit_signal("attack_confirmed")
 
 
 # Everything that calls this should be using grid.clamp_ship_placement beforehand
@@ -56,17 +63,43 @@ func place_ship(ship: Ship, index: int) -> void:
 	for i in index_array:
 		grid.cells[i] = grid.States.SHIP
 	
+	if _cursor.ship_placer:
+		_cursor.remove_child(ship)
+	
 	ship.position = grid.calculate_board_position(index)
 	add_child(ship)
-#	if is_enemy_board: DEBUG
+	placed_ships.append(ship)
+	ship_index = placed_ships.size() # Will this work???
+	emit_signal("ship_placed")
+#	if not is_player_controlled_board: DEBUG
 #		ship.hide()
 	
+	print("placed " + ship.name + " at " + str(index) + " on " + name)
+
+
+func get_next_ship_placer() -> Ship:
+	var next_ship: Ship
 	
-	#print("placed " + ship.name + " at " + str(index) + " on " + name)
+	if ship_index >= ship_lengths.size():
+		printerr("Get_next_ship_placer returned 'null'. All ships already placed.")
+		return next_ship
+	
+	var length = ship_lengths[ship_index]
+	next_ship = Ship.new(length)
+	
+	return next_ship
 
 
-# Move this to Grid.gd if another class ever needs to use it
-# For now I think it's fine here 
+func assign_ship_placer(ship: Ship) -> void:
+	_cursor.ship_placer = ship
+
+
+func clear_ship_placer() -> void:
+	if _cursor.ship_placer:
+		_cursor.ship_placer = null
+
+
+# Move this to Grid.gd if another class ever needs to use it (fine here for now)
 func _are_cells_empty(index_array: PoolIntArray) -> bool:
 	var are_empty := true
 	
@@ -76,11 +109,6 @@ func _are_cells_empty(index_array: PoolIntArray) -> bool:
 			break
 	
 	return are_empty
-
-#func player_get_next_ship() -> Ship:
-#	var ship: Ship
-#
-#	return ship
 
 
 func toggle_cursor() -> void:

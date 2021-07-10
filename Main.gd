@@ -7,15 +7,18 @@ var is_player_turn: bool # only used during play, not setup
 export var attacks_per_turn := 1
 var attacks_this_turn := 0
 
+# v3: change these to left_board and right_board for MP
 onready var player_board: Board = $Boards/PlayerBoard
 onready var enemy_board: Board = $Boards/EnemyBoard
 onready var enemy_ai: EnemyAI = $EnemyAI
 onready var panel: Panel = $UI/Panel
 
+
 func _ready() -> void:
-	# set enemy_ai parameters/variables
-	player_board.connect("all_ships_placed", self, "_on_all_ships_placed")
-	enemy_board.connect("all_ships_placed", self, "_on_all_ships_placed")
+	player_board.connect("ship_placed", self, "_on_ship_placed", [player_board])
+	enemy_board.connect("ship_placed", self, "_on_ship_placed", [enemy_board])
+#	player_board.connect("all_ships_placed", self, "_on_all_ships_placed") Main checks on its own
+#	enemy_board.connect("all_ships_placed", self, "_on_all_ships_placed")
 	player_board.connect("attack_confirmed", self, "_on_attack_confirmed")
 	enemy_board.connect("attack_confirmed", self, "_on_attack_confirmed")
 	player_board.connect("all_ships_sunk", self, "_on_all_ships_sunk", [player_board])
@@ -34,14 +37,38 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _start_setup() -> void:
-	player_board.player_start_ship_placement() # create cursor
-	enemy_ai.start_ship_placement()
+	player_board.toggle_cursor()
+	_player_ship_placement(player_board)
+	
+	if enemy_ai:
+		enemy_ai.start_ship_placement()
 
 
-func _on_all_ships_placed() -> void:
-	setups_finished += 1
+func _player_ship_placement(board: Board):
+	var ship = board.get_next_ship_placer()
+	if ship:
+		board.assign_ship_placer(ship)
+
+
+func _on_ship_placed(board: Board) -> void:
+	var all_ships_placed = board.placed_ships.size() >= board.ship_lengths.size()
+	
+	if all_ships_placed:
+		board.clear_ship_placer()
+		setups_finished += 1
+	
 	if setups_finished >= 2:
 		_start_player_turn()
+		return
+	
+	if board.is_player_controlled_board:
+		_player_ship_placement(board)
+
+
+#func _on_all_ships_placed() -> void:
+#	setups_finished += 1
+#	if setups_finished >= 2:
+#		_start_player_turn()
 
 
 func _start_player_turn() -> void:

@@ -1,6 +1,10 @@
 class_name EnemyAI
 extends Node
 
+# TODO: I'd like to experiment with the Strategy pattern with two attack guessing algorithms:
+# 			One basic algorithm with totally random guessing
+# 			One complex algorithm with checkerboard guessing (see: https://www.thesprucecrafts.com/how-to-win-at-battleship-411068)
+
 var prev_attack: int
 
 var rng := RandomNumberGenerator.new()
@@ -13,6 +17,10 @@ onready var my_board: Board = $"../Boards/EnemyBoard"
 func _ready() -> void:
 	rng.randomize()
 	my_board.connect("ship_not_placed", self, "_on_ship_not_placed")
+
+
+func start_turn() -> void:
+	print("enemy's turn")
 
 
 func start_ship_placement() -> void:
@@ -41,7 +49,7 @@ func _try_place_ship(ship: Ship) -> void:
 	if no_ships_adjacent:
 		my_board.place_ship(ship, index)
 	else:
-		print(ship.name + " was too close to another ship")
+		#print(ship.name + " was too close to another ship")
 		_try_place_ship(ship)
 
 

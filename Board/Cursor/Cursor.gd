@@ -5,8 +5,9 @@ extends Node2D
 
 signal moved(new_index)
 signal accept_pressed(index)
+signal next_ship_requested
 
-var ship_placer: Ship setget set_ship_placer
+var ship_placer: Ship setget _set_ship_placer
 
 # preload for DEBUG
 var grid: Resource = preload("res://PlayerGrid.tres")
@@ -29,7 +30,7 @@ onready var _timer: Timer = $Timer
 
 func _ready() -> void:
 	yield(owner, "ready") # wait for Board to set board_position = its position
-	set_bounds()
+	_set_bounds()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -48,7 +49,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("ui_accept"):
 		get_tree().set_input_as_handled()
 		emit_signal("accept_pressed", index)
-		print("clicked " + str(index))
+		#print("clicked " + str(index))
 	
 	# Make some preliminary checks to see whether the cursor should move if user presses an arrow key
 	var should_move := event.is_pressed()
@@ -91,7 +92,7 @@ func set_index(value: int) -> void:
 	_timer.start(ui_cooldown)
 
 
-func set_ship_placer(ship: Ship) -> void:
+func _set_ship_placer(ship: Ship) -> void:
 	var is_vertical := false
 	
 	# Retain is_vertical status from previous ship placer
@@ -106,8 +107,13 @@ func set_ship_placer(ship: Ship) -> void:
 		add_child(ship_placer)
 		self.index = index # reapply ship_placement clamp
 
+# Might just do this on Main
+#func _on_ship_placed() -> void:
+#	ship_placer = null
+#	emit_signal("next_ship_requested")
 
-func set_bounds() -> void:
+
+func _set_bounds() -> void:
 	if not grid:
 		printerr("set_bounds(): Missing Grid resource assigned to Cursor.")
 		return
