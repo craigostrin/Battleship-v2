@@ -12,6 +12,7 @@ var is_vertical := false setget _set_is_vertical
 var index_array := []
 
 var _hits: int
+var is_sunk := false
 
 var _end_sprite: Texture = preload("res://Art/ship_end.png")
 var _mid_sprite: Texture = preload("res://Art/ship_middle.png")
@@ -38,6 +39,7 @@ func _ready() -> void:
 func hit():
 	_hits += 1
 	if _hits >= length:
+		is_sunk = true
 		show()
 		modulate = Color.black
 		emit_signal("ship_sunk")

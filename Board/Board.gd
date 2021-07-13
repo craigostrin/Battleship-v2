@@ -1,21 +1,25 @@
 class_name Board
 extends Node2D
 
-signal ship_placed
-signal ship_not_placed(ship) #used by EnemyAI to try again
-signal attack_confirmed
-signal attack_not_confirmed
+signal next_ship_requested
+signal ship_not_placed(ship) # used by EnemyAI to try again
+signal all_ships_placed
+signal target_confirmed(index) # index used by EnemyAI to keep track of attacked cells
+signal target_not_confirmed
 signal all_ships_sunk
 
-export var is_player_controlled_board := true
+export var is_player_controlled := true
 
 var ship_lengths := [5, 4, 3, 3, 2]
 var placed_ships := []
 var ship_index := placed_ships.size()
+
+var targeted_cells := {}
 var ships_sunk := 0
 
 export var grid: Resource = preload("res://PlayerGrid.tres")
 export var default_sprite: Texture = preload("res://Art/water.png")
+export var target_sprite: Texture = preload("res://Art/target.png")
 export var hit_sprite: Texture = preload("res://Art/hit_transparent.png")
 export var miss_sprite: Texture = preload("res://Art/miss.png")
 
@@ -41,17 +45,36 @@ func _on_accept_pressed(index: int) -> void:
 		var ship: Ship = _cursor.ship_placer
 		place_ship(ship, index)
 	else:
-		attack(index)
+		#attack(index)
+		target_cell(index)
 
 
-func attack(index: int) -> void:
+func target_cell(index: int) -> void:
 	if _cursor.ship_placer:
 		return
 	
-	var cell = grid.cells[index]
-	if cell == grid.States.HIT or cell == grid.States.MISS:
-		emit_signal("attack_not_confirmed")
+	var targeted_cell = grid.cells[index]
+	
+	if targeted_cell == grid.States.HIT or targeted_cell == grid.States.MISS or index in targeted_cells:
+		emit_signal("target_not_confirmed")
 		return
+	
+	var sprite = create_sprite_at_index(target_sprite, index)
+	targeted_cells[index] = sprite
+	emit_signal("target_confirmed")
+
+
+func attack_targeted_cells() -> void:
+	for index in targeted_cells.keys():
+		var sprite = targeted_cells[index]
+		sprite.queue_free()
+		attack(index)
+	
+	targeted_cells.clear()
+
+
+func attack(index: int) -> void:
+	var cell = grid.cells[index]
 	
 	if cell == grid.States.EMPTY:
 		cell = grid.States.MISS
@@ -64,8 +87,6 @@ func attack(index: int) -> void:
 		create_sprite_at_index(hit_sprite, index)
 	
 	grid.cells[index] = cell
-	
-	emit_signal("attack_confirmed")
 
 
 func _on_ship_sunk() -> void:
@@ -74,9 +95,14 @@ func _on_ship_sunk() -> void:
 		emit_signal("all_ships_sunk")
 
 
+func toggle_ships_revealed() -> void:
+	for ship in placed_ships:
+		if not ship.is_sunk:
+			ship.visible = !ship.visible
+
+
 # Everything that calls this should be using grid.clamp_ship_placement beforehand
 func place_ship(ship: Ship, index: int) -> void:
-	print("called place_ship")
 	var length := ship.length
 	var is_vertical := ship.is_vertical
 	var index_array: PoolIntArray = grid.get_ship_index_array(index, length, is_vertical)
@@ -98,11 +124,17 @@ func place_ship(ship: Ship, index: int) -> void:
 	ship.connect("ship_sunk", self, "_on_ship_sunk")
 	
 	ship_index = placed_ships.size() # I guess this works?
-	emit_signal("ship_placed")
-	if not is_player_controlled_board:
+	
+	print(name + " placed " + ship.name + " at " + str(index_array))
+	
+	if not is_player_controlled:
 		ship.hide()
 	
-	print("placed " + ship.name + " at " + str(index) + " on " + name)
+	if placed_ships.size() >= ship_lengths.size():
+		emit_signal("all_ships_placed")
+	
+	elif is_player_controlled:
+		emit_signal("next_ship_requested")
 
 
 func get_next_ship_placer() -> Ship:
@@ -149,13 +181,14 @@ func get_ship_at_index(index: int) -> Ship:
 	return ship
 
 
-func toggle_cursor() -> void:
-	_cursor.visible = !_cursor.visible
-	_cursor.set_process_unhandled_input(_cursor.visible)
+func show_cursor(value: bool) -> void:
+	_cursor.visible = value
+	_cursor.set_process_unhandled_input(value)
 
 
-func create_sprite_at_index(texture: Texture, index: int) -> void:
+func create_sprite_at_index(texture: Texture, index: int) -> Sprite:
 	var sprite = Sprite.new()
 	sprite.position = grid.calculate_board_position(index)
 	sprite.texture = texture
 	add_child(sprite)
+	return sprite

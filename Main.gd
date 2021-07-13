@@ -1,27 +1,32 @@
 # Manages the two phases and turn order
 extends Node
 
+# I'm cheating a bit so I don't have to refactor a bunch:
+# Left board will always go first, and left board will always be a player in singleplayer matches
+
 var setups_finished := 0
-var is_player_turn: bool # only used during play, not setup
-export var attacks_per_turn := 5
+var is_left_turn: bool # only used during play, not setup
+export var attacks_per_turn := 1
 var attacks_this_turn := 0
 
-# v3: change these to left_board and right_board for MP
-onready var player_board: Board = $Boards/PlayerBoard
-onready var enemy_board: Board = $Boards/EnemyBoard
-onready var enemy_ai: EnemyAI = $EnemyAI
+var enemy_ais := []
+var enemy_ai_scene = preload("res://EnemyAI.tscn")
+var left_enemy_ai: EnemyAI
+var right_enemy_ai: EnemyAI
+
+onready var left_board: Board = $Boards/LeftBoard
+onready var right_board: Board = $Boards/RightBoard
 onready var panel: Panel = $UI/Panel
 
 
-# TODO: Make it so two AIs can play each other
-
 func _ready() -> void:
-	player_board.connect("ship_placed", self, "_on_ship_placed", [player_board])
-	enemy_board.connect("ship_placed", self, "_on_ship_placed", [enemy_board])
-	player_board.connect("attack_confirmed", self, "_on_attack_confirmed")
-	enemy_board.connect("attack_confirmed", self, "_on_attack_confirmed")
-	player_board.connect("all_ships_sunk", self, "_on_all_ships_sunk", [player_board])
-	enemy_board.connect("all_ships_sunk", self, "_on_all_ships_sunk", [enemy_board])
+	var boards = [left_board, right_board]
+	_connect_signals(boards)
+	
+	right_board.is_player_controlled = true
+#	_setup_enemy_ai(left_board)
+	_setup_enemy_ai(right_board)
+	
 	panel.show()
 
 
@@ -33,14 +38,43 @@ func _unhandled_input(event: InputEvent) -> void:
 	if panel.visible and event.is_action_pressed("ui_accept"):
 		panel.hide()
 		_start_setup()
+	
+	if event.is_action_pressed("ui_end"):
+		right_board.toggle_ships_revealed()
+
+
+func _setup_enemy_ai(my_board: Board) -> void:
+	var ai = enemy_ai_scene.instance()
+	var opponent_board: Board = right_board if my_board == left_board else left_board
+	
+	ai.init(my_board, opponent_board)
+	my_board.is_player_controlled = false
+	
+	enemy_ais.append(ai)
+	
+	if my_board == right_board: right_enemy_ai = ai
+	else: left_enemy_ai = ai
+	
+	ai.name = my_board.name + ai.name
+	add_child(ai)
+
+
+# Must be done AFTER Enemy AIs are setup
+func _connect_signals(boards: Array) -> void:
+	for board in boards:
+		board.connect("next_ship_requested", self, "_on_next_ship_requested", [board])
+		board.connect("all_ships_placed", self, "_on_all_ships_placed", [board])
+		board.connect("target_confirmed", self, "_on_target_confirmed", [board])
+		board.connect("all_ships_sunk", self, "_on_all_ships_sunk", [board])
 
 
 func _start_setup() -> void:
-	player_board.toggle_cursor()
-	_player_ship_placement(player_board)
+	if left_board.is_player_controlled:
+		left_board.show_cursor(true)
+		_player_ship_placement(left_board)
 	
-	if enemy_ai:
-		enemy_ai.start_ship_placement()
+	for ai in enemy_ais:
+		ai.start_ship_placement()
 
 
 func _player_ship_placement(board: Board):
@@ -49,56 +83,74 @@ func _player_ship_placement(board: Board):
 		board.assign_ship_placer(ship)
 
 
-func _on_ship_placed(board: Board) -> void:
-	var all_ships_placed = board.placed_ships.size() >= board.ship_lengths.size()
-	
-	if all_ships_placed:
-		board.clear_ship_placer()
-		setups_finished += 1
-	
-	if setups_finished >= 2:
-		player_board.toggle_cursor()
-		_start_player_turn()
-		return
-	
-	if board.is_player_controlled_board:
+func _on_next_ship_requested(board: Board):
+	if board.is_player_controlled:
 		_player_ship_placement(board)
 
 
-func _start_player_turn() -> void:
+func _on_all_ships_placed(board: Board) -> void:
+	setups_finished += 1
+	if board.is_player_controlled:
+		board.clear_ship_placer()
+		board.show_cursor(false)
+		board.toggle_ships_revealed()
+	
+	# left_board is hardcoded to always go first
+	if right_board.is_player_controlled and setups_finished == 1:
+		right_board.show_cursor(true)
+		_player_ship_placement(right_board)
+
+	if setups_finished >= 2:
+		_start_left_turn()
+
+
+func _start_left_turn() -> void:
+	print("start left turn")
 	attacks_this_turn = 0
-	is_player_turn = true
-	enemy_board.toggle_cursor()
+	is_left_turn = true
+	left_board.show_cursor(false)
+	
+	if left_enemy_ai:
+		left_enemy_ai.start_turn(attacks_per_turn)
+	else:
+		right_board.show_cursor(true)
 
 
-func _start_enemy_turn() -> void:
+func _start_right_turn() -> void:
+	print("start right turn")
 	attacks_this_turn = 0
-	is_player_turn = false
-	enemy_board.toggle_cursor()
-	enemy_ai.start_turn(attacks_per_turn)
+	is_left_turn = false
+	right_board.show_cursor(false)
+	
+	if right_enemy_ai:
+		right_enemy_ai.start_turn(attacks_per_turn)
+	else:
+		left_board.show_cursor(true)
 
 
-func _on_attack_confirmed() -> void:
+func _on_target_confirmed(board: Board) -> void:
 	attacks_this_turn += 1
 	if attacks_this_turn < attacks_per_turn:
 		return
+	else:
+		board.attack_targeted_cells()
 	
-	if is_player_turn: _start_enemy_turn()
-	else: _start_player_turn()
+	if is_left_turn: _start_right_turn()
+	else: _start_left_turn()
 
 
-func _on_all_ships_sunk(board) -> void:
+func _on_all_ships_sunk(board: Board) -> void:
+	_game_over(board)
+
+
+func _game_over(losing_board: Board) -> void:
 	get_tree().paused = true
+	var winning_board := ""
 	
-	if board == player_board: _game_over()
-	else: _victory()
-
-
-func _game_over() -> void:
-	print("Game over!")
-
-
-func _victory() -> void:
-	print("You win!")
+	if losing_board == right_board:
+		winning_board = "Player 1"
+	else:
+		winning_board = "Player 2"
+	
+	$UI/Panel/Label.text = winning_board + " won!"
 	panel.show()
-	$UI/Panel/Label.text = "YOU WIN"

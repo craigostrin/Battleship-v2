@@ -30,6 +30,8 @@ var Directions = { "LEFT" : -1, "RIGHT" : 1, "UP" : -columns, "DOWN" : columns }
 
 
 func initialize_grid() -> void:
+	cells.clear()
+	
 	for row in rows:
 		for column in columns:
 			cells.append(States.EMPTY)
