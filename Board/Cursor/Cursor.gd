@@ -10,7 +10,7 @@ signal next_ship_requested
 var ship_placer: Ship setget _set_ship_placer
 
 # preload for DEBUG
-var grid: Resource = preload("res://PlayerGrid.tres")
+var grid: Resource = preload("res://Board/LeftGrid.tres")
 export var ui_cooldown := 0.1
 var board_position := Vector2.ZERO
 

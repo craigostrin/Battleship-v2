@@ -6,11 +6,11 @@ extends Node
 
 var setups_finished := 0
 var is_left_turn: bool # only used during play, not setup
-export var attacks_per_turn := 1
+export var attacks_per_turn := 5
 var attacks_this_turn := 0
 
 var enemy_ais := []
-var enemy_ai_scene = preload("res://EnemyAI.tscn")
+var enemy_ai_scene = preload("res://EnemyAI/EnemyAI.tscn")
 var left_enemy_ai: EnemyAI
 var right_enemy_ai: EnemyAI
 
@@ -24,8 +24,8 @@ func _ready() -> void:
 	_connect_signals(boards)
 	
 	right_board.is_player_controlled = true
-#	_setup_enemy_ai(left_board)
-	_setup_enemy_ai(right_board)
+	#_setup_enemy_ai(left_board)
+	#_setup_enemy_ai(right_board)
 	
 	panel.show()
 
@@ -38,9 +38,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	if panel.visible and event.is_action_pressed("ui_accept"):
 		panel.hide()
 		_start_setup()
-	
-	if event.is_action_pressed("ui_end"):
-		right_board.toggle_ships_revealed()
 
 
 func _setup_enemy_ai(my_board: Board) -> void:
@@ -93,7 +90,7 @@ func _on_all_ships_placed(board: Board) -> void:
 	if board.is_player_controlled:
 		board.clear_ship_placer()
 		board.show_cursor(false)
-		board.toggle_ships_revealed()
+		board.reveal_ships(false)
 	
 	# left_board is hardcoded to always go first
 	if right_board.is_player_controlled and setups_finished == 1:
@@ -105,7 +102,6 @@ func _on_all_ships_placed(board: Board) -> void:
 
 
 func _start_left_turn() -> void:
-	print("start left turn")
 	attacks_this_turn = 0
 	is_left_turn = true
 	left_board.show_cursor(false)
@@ -117,7 +113,6 @@ func _start_left_turn() -> void:
 
 
 func _start_right_turn() -> void:
-	print("start right turn")
 	attacks_this_turn = 0
 	is_left_turn = false
 	right_board.show_cursor(false)
@@ -128,7 +123,8 @@ func _start_right_turn() -> void:
 		left_board.show_cursor(true)
 
 
-func _on_target_confirmed(board: Board) -> void:
+# _index_ isn't used; the signal passes it for EnemyAI to use
+func _on_target_confirmed(_index_, board: Board) -> void:
 	attacks_this_turn += 1
 	if attacks_this_turn < attacks_per_turn:
 		return
@@ -154,3 +150,11 @@ func _game_over(losing_board: Board) -> void:
 	
 	$UI/Panel/Label.text = winning_board + " won!"
 	panel.show()
+
+
+func _on_LeftRevealShipsButton_toggled(button_pressed: bool) -> void:
+	left_board.reveal_ships(button_pressed)
+
+
+func _on_RightRevealShipsButton_toggled(button_pressed: bool) -> void:
+	right_board.reveal_ships(button_pressed)

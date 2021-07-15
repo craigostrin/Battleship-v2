@@ -17,7 +17,7 @@ var ship_index := placed_ships.size()
 var targeted_cells := {}
 var ships_sunk := 0
 
-export var grid: Resource = preload("res://PlayerGrid.tres")
+export var grid: Resource
 export var default_sprite: Texture = preload("res://Art/water.png")
 export var target_sprite: Texture = preload("res://Art/target.png")
 export var hit_sprite: Texture = preload("res://Art/hit_transparent.png")
@@ -30,6 +30,7 @@ func _ready() -> void:
 	grid.initialize_grid()
 	initialize_sprites()
 	_cursor.board_position = position
+	_cursor.grid = grid
 	_cursor.connect("accept_pressed", self, "_on_accept_pressed")
 
 
@@ -57,11 +58,17 @@ func target_cell(index: int) -> void:
 	
 	if targeted_cell == grid.States.HIT or targeted_cell == grid.States.MISS or index in targeted_cells:
 		emit_signal("target_not_confirmed")
+		if index in targeted_cells:
+			print("index in targeted cells")
+		if targeted_cell == grid.States.HIT:
+			print("targeted cell already hit")
+		if targeted_cell == grid.States.MISS:
+			print("targeted cell already missed")
 		return
 	
 	var sprite = create_sprite_at_index(target_sprite, index)
 	targeted_cells[index] = sprite
-	emit_signal("target_confirmed")
+	emit_signal("target_confirmed", index)
 
 
 func attack_targeted_cells() -> void:
@@ -95,10 +102,10 @@ func _on_ship_sunk() -> void:
 		emit_signal("all_ships_sunk")
 
 
-func toggle_ships_revealed() -> void:
+func reveal_ships(boolean: bool) -> void:
 	for ship in placed_ships:
 		if not ship.is_sunk:
-			ship.visible = !ship.visible
+			ship.visible = boolean
 
 
 # Everything that calls this should be using grid.clamp_ship_placement beforehand
@@ -179,7 +186,7 @@ func get_ship_at_index(index: int) -> Ship:
 			ship = _ship
 	
 	return ship
-
+ 
 
 func show_cursor(value: bool) -> void:
 	_cursor.visible = value
