@@ -6,7 +6,7 @@ extends Node
 
 var setups_finished := 0
 var is_left_turn: bool # only used during play, not setup
-export var attacks_per_turn := 5
+export var attacks_per_turn := 1
 var attacks_this_turn := 0
 
 var enemy_ais := []
@@ -25,7 +25,7 @@ func _ready() -> void:
 	
 	right_board.is_player_controlled = true
 	#_setup_enemy_ai(left_board)
-	#_setup_enemy_ai(right_board)
+	_setup_enemy_ai(right_board)
 	
 	panel.show()
 

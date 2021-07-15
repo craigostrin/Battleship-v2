@@ -7,9 +7,19 @@ onready var _countdown := $TimerPanel/Timer
 
 var time_elapsed := 0.0
 
+func _ready() -> void:
+	# DEBUG
+	pause_mode = Node.PAUSE_MODE_PROCESS
+
 func _process(delta: float) -> void:
 	time_elapsed += delta
 	_timer_label.text = _format_seconds(time_elapsed)
+
+# DEBUG
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_end"):
+		get_tree().paused = !get_tree().paused
+		get_tree().set_input_as_handled()
 
 
 func _format_seconds(time: float) -> String:

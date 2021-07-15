@@ -9,10 +9,14 @@ extends Node
 # Easy: Basic AI, guesses completely randomly
 # Medium: Basic AI but kills ships after finding them
 # Hard: Checkerboard guesses
-var strategy
+## For Hard (maybe Med too?), AI will cheat a bit --> after sinking a ship, scan the Grid for
+## ships that've been hit but not sunk to find next guesses
+onready var strategy: Strategy = $MediumStrategy
 
+var next_guesses := []
 var unguessed_indexes := []
-var prev_attack: int
+var last_hit := -1
+var last_last_hit := -1
 var think_time := 0.5
 
 var rng := RandomNumberGenerator.new()
@@ -24,10 +28,8 @@ onready var _timer: Timer = $Timer
 
 
 func init(_my_board: Board, _opponent_board: Board) -> void:
-	print("init received " + _my_board.name)
 	my_board = _my_board
 	opponent_board = _opponent_board
-	print(my_board.name + " is my board")
 
 
 func _ready() -> void:
@@ -35,7 +37,21 @@ func _ready() -> void:
 	my_board.connect("ship_not_placed", self, "_on_ship_not_placed")
 	opponent_board.connect("target_not_confirmed", self, "_try_attack")
 	opponent_board.connect("target_confirmed", self, "_on_target_confirmed")
+	opponent_board.connect("hit", self, "_on_ship_hit")
+	opponent_board.connect("ship_sunk", self, "_on_ship_sunk")
 	initialize_unguessed()
+	strategy.grid = opponent_board.grid
+
+
+# DEBUG (duh)
+func debug_draw() -> void:
+	if next_guesses.size() > 0:
+		for index in next_guesses:
+			var pos: Vector2 = opponent_board.grid.calculate_board_position(index)
+			var rect = Rect2(pos, grid.cell_size)
+			opponent_board.rects.append(rect)
+	else:
+		opponent_board.rects.clear()
 
 
 func initialize_unguessed() -> void:
@@ -43,7 +59,6 @@ func initialize_unguessed() -> void:
 		for column in grid.columns:
 			var index = column + row * grid.columns
 			unguessed_indexes.append(index)
-	print(unguessed_indexes)
 
 
 func start_turn(number_of_attacks: int) -> void:
@@ -53,19 +68,47 @@ func start_turn(number_of_attacks: int) -> void:
 
 
 func _try_attack() -> void:
+	var unguessed_index: int
+	
+	if next_guesses.size() == 0 and last_hit >= 0:
+		next_guesses = strategy.calculate_next_guesses(next_guesses, last_hit, last_last_hit)
+	
 	_timer.start(think_time)
 	yield(_timer, "timeout")
 	
-	var index = _get_random_index(unguessed_indexes)
-	var unguessed_index = unguessed_indexes[index]
+	# Default: Pick a random, unguessed index
+	var random_index = _get_random_index(unguessed_indexes)
+	unguessed_index = unguessed_indexes[random_index]
+	
+	if next_guesses.size() > 0:
+		var strategic_guess = next_guesses[0]
+		if strategic_guess in unguessed_indexes:
+			unguessed_index = strategic_guess
+		next_guesses.remove(0)
+	
 	opponent_board.target_cell(unguessed_index)
 
 
 func _on_target_confirmed(index: int) -> void:
 	unguessed_indexes.erase(index)
-	print("enemy ai attacked " + str(index))
+	#print("enemy ai attacked " + str(index))
 
 
+func _on_ship_hit(index: int) -> void:
+	last_last_hit = last_hit
+	last_hit = index
+	next_guesses = strategy.calculate_next_guesses(next_guesses, last_hit, last_last_hit)
+
+
+func _on_ship_sunk() -> void:
+	last_last_hit = -1
+	last_hit = -1
+	next_guesses.clear()
+
+
+############################################
+############## SHIP PLACEMENT ##############
+############################################
 func start_ship_placement() -> void:
 	for length in my_board.ship_lengths:
 		var ship = Ship.new(length)

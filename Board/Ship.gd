@@ -43,7 +43,6 @@ func hit():
 		show()
 		modulate = Color.black
 		emit_signal("ship_sunk")
-	print(self.name + " is hit")
 
 
 func _set_is_vertical(value) -> void:

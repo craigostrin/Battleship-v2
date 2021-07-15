@@ -33,13 +33,19 @@ _global_script_classes=[ {
 "class": "Ship",
 "language": "GDScript",
 "path": "res://Board/Ship.gd"
+}, {
+"base": "Node",
+"class": "Strategy",
+"language": "GDScript",
+"path": "res://EnemyAI/Strategy.gd"
 } ]
 _global_script_class_icons={
 "Board": "",
 "Cursor": "",
 "EnemyAI": "",
 "Grid": "",
-"Ship": ""
+"Ship": "",
+"Strategy": ""
 }
 
 [application]
@@ -83,5 +89,5 @@ common/enable_pause_aware_picking=true
 
 [rendering]
 
-environment/default_clear_color=Color( 0.443137, 0.811765, 0.909804, 1 )
+environment/default_clear_color=Color( 0.490196, 0.34902, 0.501961, 1 )
 environment/default_environment="res://default_env.tres"

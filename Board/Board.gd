@@ -6,6 +6,8 @@ signal ship_not_placed(ship) # used by EnemyAI to try again
 signal all_ships_placed
 signal target_confirmed(index) # index used by EnemyAI to keep track of attacked cells
 signal target_not_confirmed
+signal hit(index) # used by EnemyAI's Strategy to pick next attacks
+signal ship_sunk # used by EnemyAI's Strategy to clear last_hit
 signal all_ships_sunk
 
 export var is_player_controlled := true
@@ -25,6 +27,8 @@ export var miss_sprite: Texture = preload("res://Art/miss.png")
 
 onready var _cursor: Cursor = $Cursor
 
+# DEBUG
+var rects := []
 
 func _ready() -> void:
 	grid.initialize_grid()
@@ -32,6 +36,13 @@ func _ready() -> void:
 	_cursor.board_position = position
 	_cursor.grid = grid
 	_cursor.connect("accept_pressed", self, "_on_accept_pressed")
+
+
+# DEBUG
+#func _draw() -> void:
+#	if rects.size() > 0:
+#		for rect in rects:
+#			draw_rect(rect, Color.aliceblue, false, 2.0)
 
 
 func initialize_sprites() -> void:
@@ -89,15 +100,18 @@ func attack(index: int) -> void:
 	
 	if cell == grid.States.SHIP:
 		cell = grid.States.HIT
+		emit_signal("hit", index)
 		var ship = get_ship_at_index(index)
 		ship.hit()
 		create_sprite_at_index(hit_sprite, index)
+		print(name + ": " + ship.name + " hit at " + str(index))
 	
 	grid.cells[index] = cell
 
 
 func _on_ship_sunk() -> void:
 	ships_sunk += 1
+	emit_signal("ship_sunk") # not the most elegant solution but feels too late to make an Events Singleton
 	if ships_sunk >= placed_ships.size():
 		emit_signal("all_ships_sunk")
 
