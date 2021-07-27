@@ -11,7 +11,11 @@ extends Node
 # Hard: Checkerboard guesses
 ## For Hard (maybe Med too?), AI will cheat a bit --> after sinking a ship, scan the Grid for
 ## ships that've been hit but not sunk to find next guesses
-onready var strategy: Strategy = $MediumStrategy
+var strategy: Strategy
+onready var dumb_baby_strat := $DumbBabyStrategy
+onready var easy_strategy := $EasyStrategy
+onready var medium_strategy := $MediumStrategy
+onready var hard_strategy := $HardStrategy
 
 var next_guesses := []
 var unguessed_indexes := []
@@ -40,18 +44,6 @@ func _ready() -> void:
 	opponent_board.connect("hit", self, "_on_ship_hit")
 	opponent_board.connect("ship_sunk", self, "_on_ship_sunk")
 	initialize_unguessed()
-	strategy.grid = opponent_board.grid
-
-
-# DEBUG (duh)
-func debug_draw() -> void:
-	if next_guesses.size() > 0:
-		for index in next_guesses:
-			var pos: Vector2 = opponent_board.grid.calculate_board_position(index)
-			var rect = Rect2(pos, grid.cell_size)
-			opponent_board.rects.append(rect)
-	else:
-		opponent_board.rects.clear()
 
 
 func initialize_unguessed() -> void:
@@ -62,6 +54,8 @@ func initialize_unguessed() -> void:
 
 
 func start_turn(number_of_attacks: int) -> void:
+	print("-------------")
+	print(name + " turn start")
 	for i in number_of_attacks:
 		_try_attack()
 		yield(opponent_board, "target_confirmed")
@@ -70,9 +64,6 @@ func start_turn(number_of_attacks: int) -> void:
 func _try_attack() -> void:
 	var unguessed_index: int
 	
-	if next_guesses.size() == 0 and last_hit >= 0:
-		next_guesses = strategy.calculate_next_guesses(next_guesses, last_hit, last_last_hit)
-	
 	_timer.start(think_time)
 	yield(_timer, "timeout")
 	
@@ -80,18 +71,23 @@ func _try_attack() -> void:
 	var random_index = _get_random_index(unguessed_indexes)
 	unguessed_index = unguessed_indexes[random_index]
 	
-	if next_guesses.size() > 0:
-		var strategic_guess = next_guesses[0]
+	if next_guesses.empty() and last_hit > -1:
+		print("Calculating next guesses")
+		next_guesses = strategy.calculate_next_guesses(next_guesses, last_hit, last_last_hit)
+	
+	if not next_guesses.empty():
+		var strategic_guess = next_guesses.pop_front()
 		if strategic_guess in unguessed_indexes:
 			unguessed_index = strategic_guess
-		next_guesses.remove(0)
+		else:
+			_try_attack()
+			return
 	
 	opponent_board.target_cell(unguessed_index)
 
 
 func _on_target_confirmed(index: int) -> void:
 	unguessed_indexes.erase(index)
-	#print("enemy ai attacked " + str(index))
 
 
 func _on_ship_hit(index: int) -> void:
@@ -104,6 +100,8 @@ func _on_ship_sunk() -> void:
 	last_last_hit = -1
 	last_hit = -1
 	next_guesses.clear()
+	print("XXXX next guesses cleared XXXX")
+	next_guesses = strategy.calculate_next_guesses(next_guesses, last_hit, last_last_hit)
 
 
 ############################################
@@ -139,7 +137,7 @@ func _try_place_ship(ship: Ship) -> void:
 
 
 func _get_cell_states(index_array: PoolIntArray) -> PoolIntArray:
-	var cell_array: PoolIntArray
+	var cell_array: PoolIntArray = []
 	
 	for index in index_array:
 		var cell_state = my_board.grid.cells[index]
@@ -164,3 +162,19 @@ func _get_random_bool() -> bool:
 	if rng.randi() % 2:
 		boolean = false
 	return boolean
+
+
+func set_strategy(index: int) -> void:
+	match index:
+		0:
+			strategy = dumb_baby_strat
+		1:
+			strategy = easy_strategy
+		2:
+			strategy = medium_strategy
+		3:
+			strategy = hard_strategy
+		_: # default
+			strategy = easy_strategy
+	
+	strategy.grid = opponent_board.grid

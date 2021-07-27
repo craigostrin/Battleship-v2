@@ -9,6 +9,452 @@
 [node name="Main" type="Node"]
 script = ExtResource( 1 )
 
+[node name="DEBUG" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="DebugRowPanel2" type="Panel" parent="DEBUG"]
+margin_left = 448.0
+margin_top = 64.0
+margin_right = 464.0
+margin_bottom = 384.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DEBUG/DebugRowPanel2"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/separation = 0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="DEBUG/DebugRowPanel2/VBoxContainer"]
+margin_right = 16.0
+margin_bottom = 32.0
+size_flags_vertical = 7
+text = "0"
+align = 1
+valign = 1
+
+[node name="Label1" type="Label" parent="DEBUG/DebugRowPanel2/VBoxContainer"]
+margin_top = 32.0
+margin_right = 16.0
+margin_bottom = 64.0
+size_flags_vertical = 7
+text = "1"
+align = 1
+valign = 1
+
+[node name="Label2" type="Label" parent="DEBUG/DebugRowPanel2/VBoxContainer"]
+margin_top = 64.0
+margin_right = 16.0
+margin_bottom = 96.0
+size_flags_vertical = 7
+text = "2"
+align = 1
+valign = 1
+
+[node name="Label3" type="Label" parent="DEBUG/DebugRowPanel2/VBoxContainer"]
+margin_top = 96.0
+margin_right = 16.0
+margin_bottom = 128.0
+size_flags_vertical = 7
+text = "3"
+align = 1
+valign = 1
+
+[node name="Label4" type="Label" parent="DEBUG/DebugRowPanel2/VBoxContainer"]
+margin_top = 128.0
+margin_right = 16.0
+margin_bottom = 160.0
+size_flags_vertical = 7
+text = "4"
+align = 1
+valign = 1
+
+[node name="Label5" type="Label" parent="DEBUG/DebugRowPanel2/VBoxContainer"]
+margin_top = 160.0
+margin_right = 16.0
+margin_bottom = 192.0
+size_flags_vertical = 7
+text = "5"
+align = 1
+valign = 1
+
+[node name="Label6" type="Label" parent="DEBUG/DebugRowPanel2/VBoxContainer"]
+margin_top = 192.0
+margin_right = 16.0
+margin_bottom = 224.0
+size_flags_vertical = 7
+text = "6"
+align = 1
+valign = 1
+
+[node name="Label7" type="Label" parent="DEBUG/DebugRowPanel2/VBoxContainer"]
+margin_top = 224.0
+margin_right = 16.0
+margin_bottom = 256.0
+size_flags_vertical = 7
+text = "7"
+align = 1
+valign = 1
+
+[node name="Label8" type="Label" parent="DEBUG/DebugRowPanel2/VBoxContainer"]
+margin_top = 256.0
+margin_right = 16.0
+margin_bottom = 288.0
+size_flags_vertical = 7
+text = "8"
+align = 1
+valign = 1
+
+[node name="Label9" type="Label" parent="DEBUG/DebugRowPanel2/VBoxContainer"]
+margin_top = 288.0
+margin_right = 16.0
+margin_bottom = 320.0
+size_flags_vertical = 7
+text = "9"
+align = 1
+valign = 1
+
+[node name="DebugRowPanel" type="Panel" parent="DEBUG"]
+margin_left = 32.0
+margin_top = 64.0
+margin_right = 48.0
+margin_bottom = 384.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DEBUG/DebugRowPanel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/separation = 0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="DEBUG/DebugRowPanel/VBoxContainer"]
+margin_right = 16.0
+margin_bottom = 32.0
+size_flags_vertical = 7
+text = "0"
+align = 1
+valign = 1
+
+[node name="Label1" type="Label" parent="DEBUG/DebugRowPanel/VBoxContainer"]
+margin_top = 32.0
+margin_right = 16.0
+margin_bottom = 64.0
+size_flags_vertical = 7
+text = "1"
+align = 1
+valign = 1
+
+[node name="Label2" type="Label" parent="DEBUG/DebugRowPanel/VBoxContainer"]
+margin_top = 64.0
+margin_right = 16.0
+margin_bottom = 96.0
+size_flags_vertical = 7
+text = "2"
+align = 1
+valign = 1
+
+[node name="Label3" type="Label" parent="DEBUG/DebugRowPanel/VBoxContainer"]
+margin_top = 96.0
+margin_right = 16.0
+margin_bottom = 128.0
+size_flags_vertical = 7
+text = "3"
+align = 1
+valign = 1
+
+[node name="Label4" type="Label" parent="DEBUG/DebugRowPanel/VBoxContainer"]
+margin_top = 128.0
+margin_right = 16.0
+margin_bottom = 160.0
+size_flags_vertical = 7
+text = "4"
+align = 1
+valign = 1
+
+[node name="Label5" type="Label" parent="DEBUG/DebugRowPanel/VBoxContainer"]
+margin_top = 160.0
+margin_right = 16.0
+margin_bottom = 192.0
+size_flags_vertical = 7
+text = "5"
+align = 1
+valign = 1
+
+[node name="Label6" type="Label" parent="DEBUG/DebugRowPanel/VBoxContainer"]
+margin_top = 192.0
+margin_right = 16.0
+margin_bottom = 224.0
+size_flags_vertical = 7
+text = "6"
+align = 1
+valign = 1
+
+[node name="Label7" type="Label" parent="DEBUG/DebugRowPanel/VBoxContainer"]
+margin_top = 224.0
+margin_right = 16.0
+margin_bottom = 256.0
+size_flags_vertical = 7
+text = "7"
+align = 1
+valign = 1
+
+[node name="Label8" type="Label" parent="DEBUG/DebugRowPanel/VBoxContainer"]
+margin_top = 256.0
+margin_right = 16.0
+margin_bottom = 288.0
+size_flags_vertical = 7
+text = "8"
+align = 1
+valign = 1
+
+[node name="Label9" type="Label" parent="DEBUG/DebugRowPanel/VBoxContainer"]
+margin_top = 288.0
+margin_right = 16.0
+margin_bottom = 320.0
+size_flags_vertical = 7
+text = "9"
+align = 1
+valign = 1
+
+[node name="Panel" type="Panel" parent="DEBUG"]
+margin_left = 64.0
+margin_top = 32.0
+margin_right = 384.0
+margin_bottom = 48.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="DEBUG/Panel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/separation = 0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="DEBUG/Panel/HBoxContainer"]
+margin_right = 32.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "0"
+align = 1
+valign = 2
+
+[node name="Label1" type="Label" parent="DEBUG/Panel/HBoxContainer"]
+margin_left = 32.0
+margin_right = 64.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "1"
+align = 1
+valign = 2
+
+[node name="Label2" type="Label" parent="DEBUG/Panel/HBoxContainer"]
+margin_left = 64.0
+margin_right = 96.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "2"
+align = 1
+valign = 2
+
+[node name="Label3" type="Label" parent="DEBUG/Panel/HBoxContainer"]
+margin_left = 96.0
+margin_right = 128.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "3"
+align = 1
+valign = 2
+
+[node name="Label4" type="Label" parent="DEBUG/Panel/HBoxContainer"]
+margin_left = 128.0
+margin_right = 160.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "4"
+align = 1
+valign = 2
+
+[node name="Label5" type="Label" parent="DEBUG/Panel/HBoxContainer"]
+margin_left = 160.0
+margin_right = 192.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "5"
+align = 1
+valign = 2
+
+[node name="Label6" type="Label" parent="DEBUG/Panel/HBoxContainer"]
+margin_left = 192.0
+margin_right = 224.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "6"
+align = 1
+valign = 2
+
+[node name="Label7" type="Label" parent="DEBUG/Panel/HBoxContainer"]
+margin_left = 224.0
+margin_right = 256.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "7"
+align = 1
+valign = 2
+
+[node name="Label8" type="Label" parent="DEBUG/Panel/HBoxContainer"]
+margin_left = 256.0
+margin_right = 288.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "8"
+align = 1
+valign = 2
+
+[node name="Label9" type="Label" parent="DEBUG/Panel/HBoxContainer"]
+margin_left = 288.0
+margin_right = 320.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "9"
+align = 1
+valign = 2
+
+[node name="Panel2" type="Panel" parent="DEBUG"]
+margin_left = 480.0
+margin_top = 32.0
+margin_right = 800.0
+margin_bottom = 48.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="DEBUG/Panel2"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_constants/separation = 0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="DEBUG/Panel2/HBoxContainer"]
+margin_right = 32.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "0"
+align = 1
+valign = 2
+
+[node name="Label1" type="Label" parent="DEBUG/Panel2/HBoxContainer"]
+margin_left = 32.0
+margin_right = 64.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "1"
+align = 1
+valign = 2
+
+[node name="Label2" type="Label" parent="DEBUG/Panel2/HBoxContainer"]
+margin_left = 64.0
+margin_right = 96.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "2"
+align = 1
+valign = 2
+
+[node name="Label3" type="Label" parent="DEBUG/Panel2/HBoxContainer"]
+margin_left = 96.0
+margin_right = 128.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "3"
+align = 1
+valign = 2
+
+[node name="Label4" type="Label" parent="DEBUG/Panel2/HBoxContainer"]
+margin_left = 128.0
+margin_right = 160.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "4"
+align = 1
+valign = 2
+
+[node name="Label5" type="Label" parent="DEBUG/Panel2/HBoxContainer"]
+margin_left = 160.0
+margin_right = 192.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "5"
+align = 1
+valign = 2
+
+[node name="Label6" type="Label" parent="DEBUG/Panel2/HBoxContainer"]
+margin_left = 192.0
+margin_right = 224.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "6"
+align = 1
+valign = 2
+
+[node name="Label7" type="Label" parent="DEBUG/Panel2/HBoxContainer"]
+margin_left = 224.0
+margin_right = 256.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "7"
+align = 1
+valign = 2
+
+[node name="Label8" type="Label" parent="DEBUG/Panel2/HBoxContainer"]
+margin_left = 256.0
+margin_right = 288.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "8"
+align = 1
+valign = 2
+
+[node name="Label9" type="Label" parent="DEBUG/Panel2/HBoxContainer"]
+margin_left = 288.0
+margin_right = 320.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+size_flags_vertical = 7
+text = "9"
+align = 1
+valign = 2
+
 [node name="Boards" type="Node2D" parent="."]
 __meta__ = {
 "_editor_description_": ""
@@ -81,13 +527,35 @@ margin_right = 396.0
 margin_bottom = 138.0
 text = "Watch the AIs duke it out"
 
+[node name="GameOverPanel" type="Panel" parent="UI"]
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -208.0
+margin_top = -128.0
+margin_right = 208.0
+margin_bottom = 128.0
+mouse_filter = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="UI/GameOverPanel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "Game over!"
+align = 1
+valign = 1
+
 [node name="TimerPanel" type="Panel" parent="UI"]
 anchor_left = 0.5
 anchor_right = 0.5
-margin_left = -40.0
-margin_top = 12.0
-margin_right = 40.0
-margin_bottom = 36.0
+margin_left = -96.0
+margin_top = 4.0
+margin_right = -16.0
+margin_bottom = 28.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -103,6 +571,39 @@ valign = 1
 wait_time = 120.0
 one_shot = true
 autostart = true
+
+[node name="Border" type="Panel" parent="UI"]
+modulate = Color( 0.117647, 0.0235294, 0.227451, 1 )
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -16.0
+margin_top = 4.0
+margin_right = 16.0
+margin_bottom = 28.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TurnPanel" type="Panel" parent="UI"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = 16.0
+margin_top = 4.0
+margin_right = 96.0
+margin_bottom = 28.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="UI/TurnPanel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "Turn: 000"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="LeftRevealShipsButton" type="Button" parent="UI"]
 anchor_left = 0.259

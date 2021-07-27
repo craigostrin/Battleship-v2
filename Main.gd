@@ -16,7 +16,9 @@ var right_enemy_ai: EnemyAI
 
 onready var left_board: Board = $Boards/LeftBoard
 onready var right_board: Board = $Boards/RightBoard
-onready var panel: Panel = $UI/Panel
+onready var panel := $UI/Panel
+onready var _ui := $UI
+onready var _game_over_label := $UI/GameOverPanel/Label
 
 
 func _ready() -> void:
@@ -24,8 +26,10 @@ func _ready() -> void:
 	_connect_signals(boards)
 	
 	right_board.is_player_controlled = true
-	#_setup_enemy_ai(left_board)
+	_setup_enemy_ai(left_board)
 	_setup_enemy_ai(right_board)
+	left_enemy_ai.set_strategy(1)
+	right_enemy_ai.set_strategy(2)
 	
 	panel.show()
 
@@ -102,6 +106,11 @@ func _on_all_ships_placed(board: Board) -> void:
 
 
 func _start_left_turn() -> void:
+	# DEBUG
+	if left_board.is_player_controlled:
+		print("-------------")
+		print("Player turn start")
+	_ui.turn += 1
 	attacks_this_turn = 0
 	is_left_turn = true
 	left_board.show_cursor(false)
@@ -148,8 +157,8 @@ func _game_over(losing_board: Board) -> void:
 	else:
 		winning_board = "Player 2"
 	
-	$UI/Panel/Label.text = winning_board + " won!"
-	panel.show()
+	_game_over_label.text = winning_board + " won!"
+	$UI/GameOverPanel.show()
 
 
 func _on_LeftRevealShipsButton_toggled(button_pressed: bool) -> void:

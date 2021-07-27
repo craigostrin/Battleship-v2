@@ -25,7 +25,7 @@ var _half_cell_size := cell_size / 2
 
 var cells := []
 
-enum States { EMPTY, SHIP, MISS, HIT }
+enum States { EMPTY, SHIP, MISS, HIT, SUNK }
 var Directions = { "LEFT" : -1, "RIGHT" : 1, "UP" : -columns, "DOWN" : columns }
 
 
@@ -75,6 +75,16 @@ func clamp_ship_placement(index: int, length: int, is_vertical: bool) -> int:
 
 func is_cell_empty(index: int) -> bool:
 	return true if cells[index] == States.EMPTY else false
+
+
+func is_valid_target(index: int) -> bool:
+	var is_valid_target := false
+	var cell = cells[index]
+	
+	if cell == States.EMPTY or cell == States.SHIP:
+		is_valid_target = true
+	
+	return is_valid_target
 
 
 func get_ship_index_array(index: int, length: int, is_vertical: bool) -> PoolIntArray:

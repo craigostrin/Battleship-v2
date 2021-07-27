@@ -5,7 +5,6 @@ extends Node2D
 
 signal moved(new_index)
 signal accept_pressed(index)
-signal next_ship_requested
 
 var ship_placer: Ship setget _set_ship_placer
 
@@ -49,7 +48,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("ui_accept"):
 		get_tree().set_input_as_handled()
 		emit_signal("accept_pressed", index)
-		#print("clicked " + str(index))
 	
 	# Make some preliminary checks to see whether the cursor should move if user presses an arrow key
 	var should_move := event.is_pressed()

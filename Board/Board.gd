@@ -67,18 +67,20 @@ func target_cell(index: int) -> void:
 	
 	var targeted_cell = grid.cells[index]
 	
-	if targeted_cell == grid.States.HIT or targeted_cell == grid.States.MISS or index in targeted_cells:
+	if not grid.is_valid_target(index) or index in targeted_cells:
 		emit_signal("target_not_confirmed")
-		if index in targeted_cells:
-			print("index in targeted cells")
-		if targeted_cell == grid.States.HIT:
-			print("targeted cell already hit")
-		if targeted_cell == grid.States.MISS:
-			print("targeted cell already missed")
+		# DEBUG
+#		if index in targeted_cells:
+#			print("index in targeted cells")
+#		if targeted_cell == grid.States.HIT:
+#			print("targeted cell already hit")
+#		if targeted_cell == grid.States.MISS:
+#			print("targeted cell already missed")
 		return
 	
 	var sprite = create_sprite_at_index(target_sprite, index)
 	targeted_cells[index] = sprite
+	print(str(index) + " targeted on " + name)
 	emit_signal("target_confirmed", index)
 
 
@@ -96,22 +98,25 @@ func attack(index: int) -> void:
 	
 	if cell == grid.States.EMPTY:
 		cell = grid.States.MISS
+		grid.cells[index] = cell
 		create_sprite_at_index(miss_sprite, index)
 	
 	if cell == grid.States.SHIP:
 		cell = grid.States.HIT
+		grid.cells[index] = cell
 		emit_signal("hit", index)
 		var ship = get_ship_at_index(index)
 		ship.hit()
 		create_sprite_at_index(hit_sprite, index)
 		print(name + ": " + ship.name + " hit at " + str(index))
-	
-	grid.cells[index] = cell
 
 
-func _on_ship_sunk() -> void:
+func _on_ship_sunk(ship: Ship) -> void:
 	ships_sunk += 1
-	emit_signal("ship_sunk") # not the most elegant solution but feels too late to make an Events Singleton
+	for index in ship.index_array:
+		grid.cells[index] = grid.States.SUNK
+	emit_signal("ship_sunk") # used by EnemyAI to know it can stop searching the area
+	
 	if ships_sunk >= placed_ships.size():
 		emit_signal("all_ships_sunk")
 
@@ -142,11 +147,9 @@ func place_ship(ship: Ship, index: int) -> void:
 	ship.index_array = index_array
 	add_child(ship)
 	placed_ships.append(ship)
-	ship.connect("ship_sunk", self, "_on_ship_sunk")
+	ship.connect("ship_sunk", self, "_on_ship_sunk", [ship])
 	
 	ship_index = placed_ships.size() # I guess this works?
-	
-	print(name + " placed " + ship.name + " at " + str(index_array))
 	
 	if not is_player_controlled:
 		ship.hide()
