@@ -1,5 +1,32 @@
 extends Strategy
 
+var even_or_odd: int
+
+func _ready() -> void:
+	even_or_odd = rng.randi() % 2
+	print(owner.name + ": even or odd is " + str(even_or_odd))
+
+
+# First try: even or odd should be 0 or 1
+func get_random_guess(unguessed_indexes: Array) -> int:
+	var success := false
+	var random_guess := -1
+	
+	while success == false:
+		var random_index := _get_random_index(unguessed_indexes)
+		random_guess = unguessed_indexes[random_index]
+		
+		var is_row_even = grid.get_row(random_guess) % 2 == 0
+		if is_row_even:
+			print("row is even")
+			success = random_guess
+		
+		
+		success = random_guess % 2
+		print("success = " + str(success))
+	
+	return random_guess
+
 
 func calculate_next_guesses(next_guesses: Array, last_hit: int, last_last_hit: int) -> Array:
 	# Check for already-damaged ships
@@ -15,6 +42,7 @@ func calculate_next_guesses(next_guesses: Array, last_hit: int, last_last_hit: i
 				next_guesses.append_array(valid_adjacents)
 			print("added adjacents for remaining hits: " + str(next_guesses))
 			return next_guesses
+	
 	
 	var valid_adjacents := _get_valid_adjacents(last_hit)
 	next_guesses.append_array(valid_adjacents)

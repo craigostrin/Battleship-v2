@@ -68,8 +68,7 @@ func _try_attack() -> void:
 	yield(_timer, "timeout")
 	
 	# Default: Pick a random, unguessed index
-	var random_index = _get_random_index(unguessed_indexes)
-	unguessed_index = unguessed_indexes[random_index]
+	unguessed_index = strategy.get_random_guess(unguessed_indexes)
 	
 	if next_guesses.empty() and last_hit > -1:
 		print("Calculating next guesses")

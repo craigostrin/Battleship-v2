@@ -28,8 +28,8 @@ func _ready() -> void:
 	right_board.is_player_controlled = true
 	_setup_enemy_ai(left_board)
 	_setup_enemy_ai(right_board)
-	left_enemy_ai.set_strategy(1)
-	right_enemy_ai.set_strategy(2)
+	left_enemy_ai.set_strategy(3)
+	right_enemy_ai.set_strategy(3)
 	
 	panel.show()
 

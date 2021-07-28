@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://EnemyAI/EnemyAI.gd" type="Script" id=1]
 [ext_resource path="res://EnemyAI/DumbBabyStrategy.gd" type="Script" id=2]
 [ext_resource path="res://EnemyAI/MediumStrategy.gd" type="Script" id=3]
 [ext_resource path="res://EnemyAI/EasyStrategy.gd" type="Script" id=4]
+[ext_resource path="res://EnemyAI/HardStrategy.gd" type="Script" id=5]
 
 [node name="EnemyAI" type="Node"]
 script = ExtResource( 1 )
@@ -25,3 +26,4 @@ script = ExtResource( 4 )
 script = ExtResource( 3 )
 
 [node name="HardStrategy" type="Node" parent="."]
+script = ExtResource( 5 )
